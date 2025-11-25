@@ -3,19 +3,19 @@
 # Fetch all tags
 git fetch --tags
 
-# Get the latest tag that looks like a version number (vX.Y.Z)
-# If no tag exists, default to v1.0.0
-LATEST_TAG=$(git tag -l "v*" | sort -V | tail -n1)
+# Get the latest tag that looks like a version number (ci-vX.Y.Z)
+# If no tag exists, default to 1.0.0
+LATEST_TAG=$(git tag -l "ci-v*" | sort -V | tail -n1)
 
 if [ -z "$LATEST_TAG" ]; then
-  echo "No tags found. Defaulting to v1.0.0"
+  echo "No tags found. Defaulting to 1.0.0"
   echo "NEXT_VERSION=1.0.0" >> $GITHUB_ENV
   echo "::set-output name=version::1.0.0"
   exit 0
 fi
 
-# Remove the 'v' prefix
-VERSION=${LATEST_TAG#v}
+# Remove the 'ci-v' prefix
+VERSION=${LATEST_TAG#ci-v}
 
 # Split into major, minor, patch
 IFS='.' read -r -a parts <<< "$VERSION"
