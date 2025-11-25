@@ -38,8 +38,9 @@ if [ -z "$VERSIONS" ]; then
 fi
 
 # Get IDs of versions to delete
-# We skip the first 3 (latest ones) and select the rest
-IDS_TO_DELETE=$(echo "$VERSIONS" | jq -r '.[3:] | .[].id')
+# We use 'jq -s' to read all JSON objects into a single array
+# Then we sort by created_at (descending), skip the first 3, and get the IDs of the rest
+IDS_TO_DELETE=$(echo "$VERSIONS" | jq -s -r 'sort_by(.created_at) | reverse | .[3:] | .[].id')
 
 if [ -z "$IDS_TO_DELETE" ]; then
   echo "No versions to delete. Total versions <= 3."
