@@ -10,6 +10,10 @@ fi
 REPO_NAME=${GITHUB_REPOSITORY#*/}
 OWNER=${GITHUB_REPOSITORY%/*}
 
+# Convert to lowercase
+REPO_NAME=${REPO_NAME,,}
+OWNER=${OWNER,,}
+
 echo "Cleaning up old images for package: $REPO_NAME in owner: $OWNER"
 
 # Fetch all versions of the container package
