@@ -1,0 +1,59 @@
+name: Build and Publish Image
+
+on:
+  push:
+    branches:
+      - dev
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Calculate Next Version
+        id: version
+        run: |
+          chmod +x .github/scripts/calculate_version.sh
+          .github/scripts/calculate_version.sh
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.NEXT_VERSION }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Create and Push Tag
+        run: |
+          git config user.name "Vishva Prasad"
+          git config user.email "vishva.prasad@duk.ac.in"
+          git tag ci-v${{ env.NEXT_VERSION }}
+          git push origin ci-v${{ env.NEXT_VERSION }}
+
+      - name: Cleanup Old Images
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          chmod +x .github/scripts/cleanup_images.sh
+          .github/scripts/cleanup_images.sh
