@@ -15,6 +15,6 @@ func main() {
 	port := "8080"
 	fmt.Printf("Server listening on port %s...\n", port)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		fmt.Printf("Error starting server in golang: %s\n", err)
+		fmt.Printf("Error starting server in go: %s\n", err)
 	}
 }
