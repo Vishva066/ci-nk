@@ -28,6 +28,8 @@ jobs:
 
       - name: Calculate Next Version
         id: version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required to fetch tags from GHCR
         run: |
           chmod +x .github/scripts/calculate_version.sh
           .github/scripts/calculate_version.sh
@@ -45,15 +47,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.NEXT_VERSION }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:dev-${{ env.NEXT_VERSION }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-
-      - name: Create and Push Tag
-        run: |
-          git config user.name "Vishva Prasad"
-          git config user.email "vishva.prasad@duk.ac.in"
-          git tag ci-v${{ env.NEXT_VERSION }}
-          git push origin ci-v${{ env.NEXT_VERSION }}
 
       - name: Cleanup Old Images
         env:
